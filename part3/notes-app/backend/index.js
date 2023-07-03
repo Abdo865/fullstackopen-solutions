@@ -1,31 +1,43 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
+
+const url = `mongodb+srv://abdo:085208@testcluster.xwksv6b.mongodb.net/noteApp?retryWrites=true&w=majority`;
+mongoose.set("strictQuery", false);
+mongoose.connect(url);
+
+const noteSchema = new mongoose.Schema({
+  content: String,
+  important: Boolean,
+});
+
+const Note = mongoose.model("Note", noteSchema);
 
 const app = express();
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true,
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false,
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true,
-  },
-];
+// let notes = [
+//   {
+//     content: "HTML is easy",
+//     important: true,
+//   },
+//   {
+//     content: "Browser can execute only JavaScript",
+//     important: false,
+//   },
+//   {
+//     content: "GET and POST are the most important methods of HTTP protocol",
+//     important: true,
+//   },
+// ];
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static("dist"));
 
 app.get("/api/notes", (req, res) => {
-  res.json(notes);
+  Note.find({}).then((notes) => {
+    res.json(notes);
+  });
 });
 
 app.get("/api/notes/:id", (req, res) => {
