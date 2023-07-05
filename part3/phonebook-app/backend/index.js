@@ -1,6 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+require("dotenv").config();
+const Person = require("./models/person");
 
 const app = express();
 
@@ -11,6 +13,7 @@ app.use(cors());
 app.use(
   morgan(":method :url :status :res[content-length] :response-time ms :body")
 );
+app.use(express.static("dist"));
 
 let persons = [
   {
@@ -36,43 +39,47 @@ let persons = [
 ];
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then((people) => res.json(people));
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((p) => p.id === +id);
-
-  if (person) res.json(person);
-  else res.status(404).end();
+  Person.findById(req.params.id).then((foundPerson) => res.json(foundPerson));
 });
 
-const generateId = () => {
-  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
-
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req["body"];
 
   if (!body.name) return res.status(400).json({ error: "no name found" });
-  else if (persons.find((p) => p.name === body.name))
-    return res.status(400).json({ error: "name already exists" });
+  else if (persons.find((p) => p.name === body.name)) next();
   else if (!body.number)
     return res.status(400).json({ error: "no number found" });
 
-  const id = generateId();
-  const person = { id, ...body };
-
-  res.json(person);
-  persons.push(person);
+  const person = new Person({
+    ...body,
+  });
+  person
+    .save()
+    .then((savedPerson) => res.json(savedPerson))
+    .catch((err) => {
+      next(err);
+    });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  persons = persons.filter((p) => p.id !== id);
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((resulted) => console.log(resulted))
+    .catch((err) => next(err));
+});
 
-  res.status(204).end();
+app.delete("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then((deleted) => res.status(204).end())
+    .catch((err) => next(err));
 });
 
 app.get("/info", (req, res) => {
@@ -88,6 +95,16 @@ const unknownEndpoint = (req, res) => {
 };
 
 app.use(unknownEndpoint);
+
+const errorHandler = (err, req, res, next) => {
+  console.log(err.message);
+
+  if (err.name === "CastError")
+    return res.status(400).send({ error: "Malformed id" });
+  next(err);
+};
+
+app.use(errorHandler);
 
 const PORT = 3001;
 
