@@ -19,11 +19,11 @@ const mostBlogs = (blogs) => {
   let max = blogs[0]["author"];
   blogs.forEach((blog) => {
     if (most[blog.author]) {
-      most[blog.author]++;
-      if (most[blog.author] > most[max]) max = blog.author;
-    } else most[blog.author] = 1;
+      most[blog.author].blogs++;
+      if (most[blog.author].blogs > most[max].blogs) max = blog.author;
+    } else most[blog.author] = { author: blog.author, blogs: 1 };
   });
-  return max.toString();
+  return most[max];
 };
 
 module.exports = {

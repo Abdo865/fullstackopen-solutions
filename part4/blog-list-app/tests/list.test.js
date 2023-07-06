@@ -179,6 +179,9 @@ describe("most known blogger", () => {
   ];
   test("many blogs, most one has blogs", () => {
     const result = listHelper.mostBlogs(blogs);
-    expect(result).toBe("Robert C. Martin")
+    expect(result).toEqual({
+      author: "Robert C. Martin",
+      blogs: 3,
+    });
   });
 });
