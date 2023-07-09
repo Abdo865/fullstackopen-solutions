@@ -22,4 +22,22 @@ blogsRouter.delete("/:id", async (req, res) => {
   res.status(204).end();
 });
 
+blogsRouter.put("/:id", async (req, res) => {
+  const body = req.body;
+  if (!body) return res.status(400).json({ error: "Payload cannot be empty" });
+
+  const blog = {
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes,
+  };
+
+  const updated = await Blog.findByIdAndUpdate(req.params.id, blog, {
+    new: true,
+    runValidators: true,
+  });
+  res.status(200).json(updated);
+});
+
 module.exports = blogsRouter;

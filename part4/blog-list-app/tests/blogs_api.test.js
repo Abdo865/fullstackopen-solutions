@@ -95,6 +95,18 @@ test("delete request with id", async () => {
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
 });
 
+test("updating blogs with ids", async () => {
+  const blogsBefore = await helper.BlogsInDb();
+  const blogToUpdate = blogsBefore[0];
+  blogToUpdate.likes = blogToUpdate.likes + 1;
+  const res = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(blogToUpdate)
+    .expect(200);
+
+  expect(res.body.likes).toBe(blogToUpdate.likes);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
