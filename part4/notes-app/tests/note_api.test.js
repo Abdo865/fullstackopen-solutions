@@ -99,4 +99,3 @@ test("a note could be deleted", async () => {
 afterAll(async () => {
   await mongoose.connection.close();
 });
-

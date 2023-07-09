@@ -18,8 +18,13 @@ beforeEach(async () => {
 });
 
 test("correct amount of blogs are returned", async () => {
-  const blogs = await api.get("/api/blogs");
-  expect(blogs.body).toHaveLength(helper.initialBlogs.length);
+  const blogs = await helper.BlogsInDb();
+  expect(blogs).toHaveLength(helper.initialBlogs.length);
+});
+
+test("id property is defined as id not _id", async () => {
+  const blogs = await helper.BlogsInDb();
+  expect(blogs[0].id).toBeDefined();
 });
 
 afterAll(async () => {
