@@ -50,6 +50,27 @@ test("post request testing", async () => {
   );
 });
 
+test("zero likes when no likes property defined", async () => {
+  const blog = {
+    title: "What Is a Blog, & Why Should You Create One",
+    author: "Caroline Forsey",
+    url: "https://blog.hubspot.com/marketing/what-is-a-blog",
+  };
+
+  await Blog.deleteMany({});
+
+  await api
+    .post("/api/blogs")
+    .send(blog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await helper.BlogsInDb();
+  expect(blogsAtEnd).toHaveLength(1);
+
+  expect(blogsAtEnd[0].likes).toBe(0);
+}, 10000);
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
