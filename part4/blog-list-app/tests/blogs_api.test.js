@@ -87,6 +87,14 @@ test("bad request when no title or url provided", async () => {
   await api.post("/api/blogs").send(noUrlBlog).expect(400);
 });
 
+test("delete request with id", async () => {
+  const blogs = await helper.BlogsInDb();
+  await api.delete(`/api/blogs/${blogs[0].id}`).expect(204);
+
+  const blogsAtEnd = await helper.BlogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });

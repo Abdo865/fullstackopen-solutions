@@ -17,4 +17,9 @@ blogsRouter.post("/", async (req, res) => {
   return res.status(400).send({ error: "bad request" });
 });
 
+blogsRouter.delete("/:id", async (req, res) => {
+  const blogs = await Blog.findByIdAndRemove(req.params.id);
+  res.status(204).end();
+});
+
 module.exports = blogsRouter;
