@@ -8,10 +8,13 @@ blogsRouter.get("/", async (req, res) => {
 });
 
 blogsRouter.post("/", async (req, res) => {
-  const blog = new Blog(req.body);
-  await blog.save();
+  if (req.body.url && req.body.title) {
+    const blog = new Blog(req.body);
+    await blog.save();
 
-  res.status(201).json(blog);
+    return res.status(201).json(blog);
+  }
+  return res.status(400).send({ error: "bad request" });
 });
 
 module.exports = blogsRouter;

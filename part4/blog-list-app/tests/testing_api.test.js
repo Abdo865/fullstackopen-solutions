@@ -71,6 +71,22 @@ test("zero likes when no likes property defined", async () => {
   expect(blogsAtEnd[0].likes).toBe(0);
 }, 10000);
 
+test("bad request when no title or url provided", async () => {
+  const noTitleBlog = {
+    author: "Caroline Forsey",
+    url: "https://blog.hubspot.com/marketing/what-is-a-blog",
+    likes: 30,
+  };
+  const noUrlBlog = {
+    title: "What Is a Blog, & Why Should You Create One",
+    author: "Caroline Forsey",
+    likes: 30,
+  };
+
+  await api.post("/api/blogs").send(noTitleBlog).expect(400);
+  await api.post("/api/blogs").send(noUrlBlog).expect(400);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
