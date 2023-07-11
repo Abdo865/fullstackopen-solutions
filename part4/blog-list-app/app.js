@@ -24,6 +24,7 @@ app.use(express.json());
 app.use(cors());
 app.use(middleware.requestLogger);
 app.use(middleware.tokenExtractor);
+app.use(middleware.userExtractor);
 
 // Routers
 app.use("/api/blogs", blogsRouter);
