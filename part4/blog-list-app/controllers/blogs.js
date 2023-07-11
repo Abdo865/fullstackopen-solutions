@@ -1,4 +1,5 @@
 const blogsRouter = require("express").Router();
+const jwt = require("jsonwebtoken");
 const Blog = require("../models/blog");
 const User = require("../models/user");
 
@@ -12,23 +13,34 @@ blogsRouter.get("/", async (req, res) => {
   res.json(blogs);
 });
 
+const getTokenFrom = (req) => {
+  const authorization = req.get("authorization");
+  if (authorization && authorization.startsWith("Bearer "))
+    return authorization.replace("Bearer ", "");
+  return null;
+};
+
 blogsRouter.post("/", async (req, res) => {
-  if (req.body.url && req.body.title) {
-    const user = await User.findOne({});
-    const blog = new Blog({
-      title: req.body.title,
-      author: req.body.author,
-      url: req.body.url,
-      user: user.id,
-    });
-    const savedBlog = await blog.save();
+  if (!req.body.url && !req.body.title)
+    return res.status(400).send({ error: "bad request" });
 
-    user.blogs = user.blogs.concat(blog._id);
-    user.save();
+  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET);
+  if (!decodedToken.id) return res.status(401).json({ error: "invalid token" });
 
-    return res.status(201).json(savedBlog);
-  }
-  res.status(400).send({ error: "bad request" });
+  const user = await User.findById(decodedToken.id);
+  const blog = new Blog({
+    title: req.body.title,
+    author: req.body.author,
+    url: req.body.url,
+    user: user.id,
+  });
+
+  const savedBlog = await blog.save();
+
+  user.blogs = user.blogs.concat(blog._id);
+  user.save();
+
+  res.status(201).json(savedBlog);
 });
 
 blogsRouter.delete("/:id", async (req, res) => {
