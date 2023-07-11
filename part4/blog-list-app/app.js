@@ -19,14 +19,18 @@ mongoose
   .then(() => logger.info("Connected to MongoDB"))
   .catch((err) => logger.error("Error Connecting to MongoDB:", err.message));
 
+// middleware
 app.use(express.json());
 app.use(cors());
 app.use(middleware.requestLogger);
+app.use(middleware.tokenExtractor);
 
+// Routers
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
 
+// ending middleware
 app.use(middleware.unknownEndPoint);
 app.use(middleware.errorHandler);
 
