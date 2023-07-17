@@ -24,6 +24,7 @@ app.post("/exercises", (req, res) => {
     target: number;
   }
   const body = req.body as Request;
+
   if (!body || !body.daily_exercises || !body.target)
     return res.json({ error: "parameters missing" });
   else if (!Array.isArray(body.daily_exercises))
