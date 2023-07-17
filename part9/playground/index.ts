@@ -1,8 +1,20 @@
 import express from "express";
+import { calculator, Operation } from "./calculator";
 
 const app = express();
 
 app.get("/ping", (_req, res) => res.send("pong"));
+
+app.post("/calculate", (req, res) => {
+  const { value1, value2, op } = req.body;
+
+  // handling datatypes of value1, 2
+  if (!value1 || isNaN(Number(value1)) || !value2 || isNaN(Number(value2)))
+    return res.status(404).send({ error: "..." });
+
+  const result = calculator(Number(value1), Number(value2), op as Operation);
+  return res.send({ result });
+});
 
 const PORT = 3003;
 

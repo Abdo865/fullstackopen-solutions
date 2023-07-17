@@ -1,4 +1,4 @@
-interface returnType {
+export interface returnType {
   periodLength: number;
   trainingDays: number;
   target: number;
@@ -8,7 +8,7 @@ interface returnType {
   ratingDescription: string;
 }
 
-function calculateExercises(daily: number[], target: number): returnType {
+export function calculateExercises(daily: number[], target: number): returnType {
   const trainingDays = daily.filter((day) => day > 0).length;
   const average = daily.reduce((sum, day) => sum + day, 0) / daily.length;
   const x: returnType = {
@@ -23,11 +23,11 @@ function calculateExercises(daily: number[], target: number): returnType {
   return x;
 }
 
-const daily: number[] = process.argv.map((day, i) => {
-  if (i < 2) return;
-  return +day;
-});
-const target = daily[2];
-daily.splice(0, 3);
+// const daily: number[] = process.argv.map((day, i) => {
+//   if (i < 2) return;
+//   return +day;
+// });
+// const target = daily[2];
+// daily.splice(0, 3);
 
-console.log(calculateExercises(daily, 2));
+// console.log(calculateExercises(daily, target));
